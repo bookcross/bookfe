@@ -57,6 +57,8 @@
         :total="1000">
       </el-pagination>
     </el-tab-pane>
+
+    <el-tab-pane label="分类查找" name="third" disabled></el-tab-pane>
   </el-tabs>
 
   </div>

@@ -1,7 +1,8 @@
 <template>
   <div style="background-color:#545c64">
     <el-menu
-      style="width: 1200px;margin: 0 auto;border-bottom: 1px solid #545c64"
+      style="width: 1200px;margin: 0 auto;
+      border-bottom: 1px solid #545c64"
       :default-active="activeIndex2"
       class="el-menu-demo"
       mode="horizontal"
