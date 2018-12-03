@@ -3,6 +3,8 @@ import Router from 'vue-router'
 import HelloWorld from '@/components/HelloWorld'
 import Home from '@/view/Home'
 import BookDetail from '@/view/BookDetail'
+import UserCenter from '@/view/UserCenter'
+import BookEdit from '@/view/BookEdit'
 
 Vue.use(Router)
 
@@ -21,7 +23,9 @@ export default new Router({
       name: 'Home',
       component: Home,
       meta:{
-        keepAlive:true
+        keepAlive:true,//是否属于正常页面
+        leftAlive:false,//是否拥有左边栏目
+        rightAlive:true//是否拥有右边栏目
       }
     },
     {
@@ -29,7 +33,29 @@ export default new Router({
       name: 'BookDetail',
       component: BookDetail,
       meta:{
-        keepAlive:true
+        keepAlive:true,//是否属于正常页面
+        leftAlive:false,//是否拥有左边菜单栏目
+        rightAlive:true//是否拥有右边栏目
+      }
+    },
+    {
+      path: '/userCenter',
+      name: 'UserCenter',
+      component: UserCenter,
+      meta:{
+        keepAlive:true,//是否属于正常页面
+        leftAlive:true,//是否拥有左边菜单栏目
+        rightAlive:false//是否拥有右边栏目
+      }
+    },
+    {
+      path: '/bookEdit',
+      name: 'BookEdit',
+      component: BookEdit,
+      meta:{
+        keepAlive:true,//是否属于正常页面
+        leftAlive:true,//是否拥有左边菜单栏目
+        rightAlive:false//是否拥有右边栏目
       }
     }
   ]

@@ -30,12 +30,10 @@
           <b>适合年龄：</b><span>成人</span><br/>
           <b>现在位置：</b><span>湖北省武汉市</span><br/>
           <el-button type="text" size="big" icon="el-icon-star-off">收藏(41)</el-button>
-          <el-button type="text" icon="el-icon-edit">评论(22)</el-button>
+          <el-button type="text" icon="el-icon-edit" @click="dialogFormVisible = true">书评(22)</el-button>
           <p>
             <el-button type="primary" size="small">借阅</el-button>
           </p>
-
-
           <br/>
         </div>
       </el-col>
@@ -46,12 +44,19 @@
     </div>
     <div style="margin:2px 0px;">
       <h4>漂流动态：</h4>
-      <div id="allmap" ref="allmap" style="height: 200px"></div>
+      <div id="allmap" ref="allmap" style="height: 300px"></div>
     </div>
     <div style="margin:2px 0px;">
-      <h4>短评：</h4>
+      <h4>书评：</h4>
       <comment :comments="commentData"></comment>
     </div>
+    <el-dialog title="评论" :visible.sync="dialogFormVisible">
+      <div><Tinymce ref="editor" :height="400"/></div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 
 </template>
@@ -59,6 +64,7 @@
 <script>
   import * as CommentData from '../mock/mockdata'
   import comment from '../components/comment'
+  import Tinymce from '../components/Tinymce'
 
   import showMore from '../components/ShowMore'
   export default {
@@ -70,7 +76,7 @@
     },
     components: {
       showMore,
-      comment
+      comment,Tinymce
     },
     methods:{
       map(){
@@ -87,7 +93,7 @@
             BMAP_HYBRID_MAP
           ]}));
         map.setCurrentCity("北京");// 设置地图显示的城市 此项是必须设置的
-        map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
+        // map.enableScrollWheelZoom(true); //开启鼠标滚轮缩放
         var polyline = new BMap.Polyline([
             new BMap.Point(116.488, 39.920),
             new BMap.Point(118.499, 34.920),
@@ -110,6 +116,7 @@
     name: "BookDetail",
     data() {
       return {
+        dialogFormVisible:false,
         commentData: [],
         value5: 4.5,
         contentTxt: "注意：该项目目前使用element-ui@1.4.2版本，所以最低兼容 Vue 2.3.0\n" +

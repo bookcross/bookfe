@@ -18,8 +18,8 @@
           <el-col v-for="(o, index) in this.linkList" :key="o.id" style="padding-top: 10px;width: 157px">
             <el-card :body-style="{ padding: '0px' }">
               <img src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3009903943,852000831&fm=26&gp=0.jpg" class="image">
-              <div style="padding: 14px;">
-                <span>好吃的汉堡</span>
+                <div style="padding: 14px;">
+                <span v-on:click="jumpToBookdetail()">好吃的汉堡</span>
                 <div class="bottom clearfix">
                   <time class="time">陈小夏普</time>
                 </div>
@@ -150,6 +150,9 @@
     methods: {
       handleClick(tab, event) {
         console.log(tab, event);
+      },
+      jumpToBookdetail:function () {
+        this.$router.push('/bookdetail');
       }
     }
   };
