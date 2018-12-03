@@ -39,8 +39,8 @@ export default {
     },
     height: {
       type: Number,
-      required: false,
-      default: 360
+      required: true
+      // default: 360
     }
   },
   data() {
@@ -99,8 +99,8 @@ export default {
         plugins: plugins,
         end_container_on_empty_block: true,
         powerpaste_word_import: 'clean',
-        code_dialog_height: 450,
-        code_dialog_width: 1000,
+        // code_dialog_height: 450,
+        // code_dialog_width: 1000,
         advlist_bullet_styles: 'square',
         advlist_number_styles: 'default',
         imagetools_cors_hosts: ['www.tinymce.com', 'codepen.io'],

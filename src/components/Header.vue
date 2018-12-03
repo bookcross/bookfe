@@ -15,14 +15,14 @@
         <img src="../assets/logowhite.png" style="height: 50px;margin-top: 6px"/>&nbsp;&nbsp;
       </div>
       <el-menu-item index="1" v-on:click="jumpTo('/')">图书中心</el-menu-item>
-      <el-menu-item index="2">广场</el-menu-item>
       <el-menu-item index="3">意见栏</el-menu-item>
+      <el-menu-item index="2" disabled>广场</el-menu-item>
       <!--<el-menu-item index="3" disabled>消息中心</el-menu-item>-->
-      <div style="float: right;margin-top: 10px" v-if="false">
+      <div style="float: right;margin-top: 10px" v-if="!isLogin">
         <el-button size="small">登录</el-button>
         <el-button type="text" style="color:white">注册</el-button>
       </div>
-      <div style="float: right;margin-top: 13px" v-if="true">
+      <div style="float: right;margin-top: 13px" v-if="isLogin">
         <img src="../assets/logo.png" style="height: 40px;background-color: white;float: left;border-radius: 50%" />
         <el-dropdown>
           <span class="el-dropdown-link">
@@ -31,7 +31,7 @@
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item><span v-on:click="jumpTo('/userCenter')">个人中心</span></el-dropdown-item>
             <el-dropdown-item>我的消息</el-dropdown-item>
-            <el-dropdown-item>退出</el-dropdown-item>
+            <el-dropdown-item><span  v-on:click="logout()">退出</span></el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -61,7 +61,8 @@
         select: '图书',
         input5: '',
         activeIndex: '1',
-        activeIndex2: '1'
+        activeIndex2: '1',
+        isLogin:true
       };
     },
     methods: {
@@ -70,6 +71,9 @@
       },
       jumpTo: function (s) {
         this.$router.push(s);
+      },
+      logout:function(){
+        this.isLogin=false
       }
     }
   }

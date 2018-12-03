@@ -5,6 +5,8 @@ import Home from '@/view/Home'
 import BookDetail from '@/view/BookDetail'
 import UserCenter from '@/view/UserCenter'
 import BookEdit from '@/view/BookEdit'
+import Login from '@/view/Login'
+import Register from '@/view/Register'
 
 Vue.use(Router)
 
@@ -55,6 +57,26 @@ export default new Router({
       meta:{
         keepAlive:true,//是否属于正常页面
         leftAlive:true,//是否拥有左边菜单栏目
+        rightAlive:false//是否拥有右边栏目
+      }
+    },
+    {
+      path: '/Login',
+      name: 'Login',
+      component: Login,
+      meta:{
+        keepAlive:true,//是否属于正常页面
+        leftAlive:false,//是否拥有左边菜单栏目
+        rightAlive:false//是否拥有右边栏目
+      }
+    },
+    {
+      path: '/Register',
+      name: 'Register',
+      component: Register,
+      meta:{
+        keepAlive:true,//是否属于正常页面
+        leftAlive:false,//是否拥有左边菜单栏目
         rightAlive:false//是否拥有右边栏目
       }
     }

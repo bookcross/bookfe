@@ -21,6 +21,9 @@
             <el-col :span="19"><div class="grid-content bg-purple">
             <router-view></router-view></div></el-col>
           </el-row>
+          <el-row :gutter="20"  v-if="!($route.meta.rightAlive||$route.meta.leftAlive)">
+            <el-col><div><router-view></router-view></div></el-col>
+          </el-row>
         </el-main>
       </el-container>
     </el-container>
@@ -42,6 +45,11 @@
     data() {
       return {
         isRouterAlive: true
+      }
+    },
+    methods:{
+      jumpTo:function (s) {
+        this.$router.push(s);
       }
     }
   }
