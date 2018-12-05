@@ -20,7 +20,7 @@
       <el-menu-item index="2" disabled>广场</el-menu-item>
       <!--<el-menu-item index="3" disabled>消息中心</el-menu-item>-->
       <div style="float: right;margin-top: 10px" v-if="!isLogin">
-        <el-button size="small">登录</el-button>
+        <el-button size="small" v-on:click="jumpTo('/login')">登录</el-button>
         <el-button type="text" style="color:white">注册</el-button>
       </div>
       <div style="float: right;margin-top: 13px" v-if="isLogin">
@@ -88,6 +88,7 @@
         LangStorage.removeItem('username')
         this.$store.commit('changeLogin', false)
         this.$store.commit('changeUser', undefined)
+        this.$router.push('/login');
       }
     }
   }

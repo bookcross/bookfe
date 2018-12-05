@@ -46,8 +46,8 @@
     data() {
       return {
         loginForm: {
-          username: '12123',
-          password: '123'
+          username: '',
+          password: ''
         },
         param: ''
       }
@@ -87,12 +87,15 @@
               setToken(result.data.data)
               Message({
                 message: '登录成功',
-                type: 'success'
+                type: 'success',
+                duration:1000
               });
+              aaa.$router.push('/');
             }else{
               Message({
                 message: '登录失败',
-                type: 'error'
+                type: 'error',
+                duration:1000
               });
             }
         })
