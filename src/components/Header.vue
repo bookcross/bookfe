@@ -13,6 +13,7 @@
 
       <div style="float: left">
         <img src="../assets/logowhite.png" style="height: 50px;margin-top: 6px"/>&nbsp;&nbsp;
+
       </div>
       <el-menu-item index="1" v-on:click="jumpTo('/')">图书中心</el-menu-item>
       <el-menu-item index="3">意见栏</el-menu-item>
@@ -26,7 +27,7 @@
         <img src="../assets/logo.png" style="height: 40px;background-color: white;float: left;border-radius: 50%" />
         <el-dropdown>
           <span class="el-dropdown-link">
-          <el-button type="text" style="color:white">&nbsp;&nbsp;&nbsp;熊俊伟</el-button>
+          <el-button type="text" style="color:white">&nbsp;&nbsp;&nbsp;{{username}}</el-button>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item><span v-on:click="jumpTo('/userCenter')">个人中心</span></el-dropdown-item>
@@ -55,6 +56,8 @@
 </template>
 
 <script>
+  import LangStorage from '../utils/lang'
+  import auth from '../utils/auth'
   export default {
     data() {
       return {
@@ -62,8 +65,15 @@
         input5: '',
         activeIndex: '1',
         activeIndex2: '1',
-        isLogin:true
       };
+    },
+    computed:{
+      username(){
+        return this.$store.state.username
+      },
+      isLogin(){
+        return this.$store.state.isLogin
+      }
     },
     methods: {
       handleSelect(key, keyPath) {
@@ -74,6 +84,10 @@
       },
       logout:function(){
         this.isLogin=false
+        LangStorage.removeItem('isLogin')
+        LangStorage.removeItem('username')
+        this.$store.commit('changeLogin', false)
+        this.$store.commit('changeUser', undefined)
       }
     }
   }
