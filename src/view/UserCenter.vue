@@ -1,7 +1,7 @@
 <template>
   <div>
     <template>
-      <el-tabs activeName="first" @tab-click="handleClick">
+      <el-tabs :activeName="activeLabel" @tab-click="handleClick">
         <el-tab-pane label="个人信息" name="first">
           <user-setting></user-setting>
         </el-tab-pane>
@@ -17,7 +17,6 @@
 </template>
 
 <script>
-
   import UserSetting from './UserSetting'
   import UserBook from './UserBook'
   import UserCollection from './UserCollection'
@@ -34,8 +33,12 @@
         this.$router.push(s);
       }
     },
+    mounted(){
+      console.log(this.$route.params.activeLabel)
+    },
     data() {
       return {
+        activeLabel:'first',
         dialogFormVisible:false,
         ruleForm: {
           username: '',

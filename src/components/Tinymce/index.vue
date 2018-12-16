@@ -14,7 +14,7 @@ import toolbar from './toolbar'
 
 export default {
   name: 'Tinymce',
-  // components: { editorImage },
+  components: { editorImage },
   props: {
     id: {
       type: String,

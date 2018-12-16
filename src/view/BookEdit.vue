@@ -1,40 +1,67 @@
 <template>
   <div>
-    <el-form :model="bookForm" label-width="100px">
-      <el-form-item label="书名：" prop="username">
-        <el-input v-model="bookForm.bookName" style='width:200px'></el-input>
+    <el-form :inline="true"  class="demo-form-inline" >
+      <el-form-item label="图书书名">
+        <el-input placeholder="书名" style="width: 200px" v-model="bookForm.bookName"></el-input>
       </el-form-item>
-      <el-form-item label="地图取点：">
+      <el-form-item label="图书作者">
+        <el-input placeholder="作者" style="width: 200px" v-model="bookForm.author"></el-input>
+      </el-form-item>
+      <br/>
+      <el-form-item label="地图取点">
         <span @click="showMap(true)">
-        <el-input v-model="bookForm.address" style='width:200px' :readonly="true"></el-input></span>
+        <el-input v-model="bookForm.address" style='width:200px' :readonly="true" placeholder="地图选点"></el-input></span>
         <el-input v-model="bookForm.addressJ" style='width:200px' type="hidden"></el-input>
         <el-input v-model="bookForm.addressW" style='width:200px' type="hidden"></el-input>
+      </el-form-item>
+      <br/>
+      <el-form-item label="适合年龄">
+        <el-select  placeholder="适合年龄" style="width: 200px" v-model="bookForm.suitableAge">
+          <el-option label="儿童" value="shanghai"></el-option>
+          <el-option label="青年" value="beijing"></el-option>
+          <el-option label="成人" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="图书类型">
+        <el-select  placeholder="类型" style="width: 200px" v-model="bookForm.bookType">
+          <el-option label="教科书" value="shanghai"></el-option>
+          <el-option label="计算机" value="beijing"></el-option>
+          <el-option label="小说" value="beijing"></el-option>
+          <el-option label="散文" value="beijing"></el-option>
+          <el-option label="诗歌" value="beijing"></el-option>
+          <el-option label="工具类" value="beijing"></el-option>
+        </el-select>
+      </el-form-item>
+      <br/>
+      <el-form-item label="图书内容">
+        <el-upload
+          :file-list="bookPicList"
+          action="/zuul/file/upload"
+          list-type="picture-card"
+          :on-preview="handlePictureCardPreview"
+          :on-remove="handleRemove"
+          :on-success="handleSuccess">
+          <i class="el-icon-plus"></i>
+        </el-upload><el-dialog :visible.sync="dialogVisible">
+        <img width="100%" :src="dialogImageUrl" alt="">
+      </el-dialog>
 
       </el-form-item>
-      <el-form-item label="作者：" prop="phoneNum">
-        <el-input v-model="bookForm.author" style='width:200px'></el-input>
+      <br/>
+      <el-form-item label="图书介绍">
+        <Tinymce ref="editor" :height="300" v-model="bookForm.bookConent" />
       </el-form-item>
-      <el-form-item label="封面：">
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          list-type="picture-card">
-          <i class="el-icon-plus"></i>
-        </el-upload>
+      <br/>
+      <el-form-item label=" " label-width="70px">
+        <el-button type="primary" @click="saveBook">保存</el-button>
       </el-form-item>
-      <!--<el-form-item label="内页图：">-->
-        <!--<el-input v-model="bookForm.innerPic" style='width:200px'></el-input>-->
-      <!--</el-form-item>-->
-      <el-form-item label="简介：" prop="userImg">
-        <div>
-          <Tinymce ref="editor" :height="300"/>
-        </div>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary">保存</el-button>
-        <el-button type="warning">取消</el-button>
-      </el-form-item>
+      <br/>
+      <div >
+
+      </div>
     </el-form>
-    <el-dialog  v-bind:title="bookForm.address"  :visible.sync="dialogVisible">
+
+    <el-dialog  v-bind:title="bookForm.address"  :visible.sync="dialogVisible2">
       <div id="allmap2" ref="allmap2" style="height: 300px"></div>
     </el-dialog>
     <!--<div id="allmap2" ref="allmap2" style="height: 300px"></div>-->
@@ -43,16 +70,29 @@
 
 <script>
   import Tinymce from '../components/Tinymce'
+  import request from '@/utils/request'
+  import {getToken, setToken} from '../utils/auth'
 
+  export function saveBook(form) {
+    return request({
+      url: '/zuul/bookInfo/addBook',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post',
+      data: form
+    })
+  }
   const defaultForm = {
     bookName: "",
     address: "",
     addressJ: "",
     addressW: "",
     author: "",
-    headPic: "",
-    innerPic: "",
-    describe: ""
+    picList:[],
+    bookConent: "",
+    bookType:"",
+    suitableAge:""
   }
   export default {
     name: "BookEdit",
@@ -70,15 +110,50 @@
     },
     data() {
       return {
+        dialogImageUrl:'',
+        bookPicList:[],
         dialogVisibleShow:false,
+        dialogVisible2:false,
         dialogVisible: false,
         abc: "abc",
         bookForm: Object.assign({}, defaultForm)
       }
     },
     methods: {
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+        this.bookPicList=fileList
+      },
+      saveBook:function(){
+        // this.$router.push({ name: 'UserCenter', params: { activeLabel: 'first' }})
+        console.log(this.bookPicList)
+        this.bookForm.picList=[];
+        for(var s in this.bookPicList){
+          var pic={url:''}
+          pic.url=this.bookPicList[s].url
+          console.log(pic)
+          this.bookForm.picList.push(pic)
+        }
+        console.log(this.bookForm)
+        saveBook(this.bookForm).then(response => {
+          console.log(response)
+          if(response.restCode=='0000'){
+
+          }
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      handleSuccess(response,file, fileList) {
+        file.url=response.data
+        this.bookPicList=fileList
+      },
+      handlePictureCardPreview(file) {
+        this.dialogImageUrl = file.url;
+        this.dialogVisible = true;
+      },
       showMap: function (e) {
-        this.dialogVisible = true
+        this.dialogVisible2 = true
         this.map()
 
       },

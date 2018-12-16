@@ -10,14 +10,14 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/zuul': {
-        target: 'http://127.0.0.1:1002/',
+        target: 'http://127.0.0.1:5008/',
         changeOrigin: true,
         pathRewrite: {
           '^/zuul/': '/'
         }
       },
       '/auth': {
-        target: 'http://127.0.0.1:1001/',
+        target: 'http://127.0.0.1:5005/',
         changeOrigin: true,
         pathRewrite: {
           '^/auth/': '/'
@@ -25,7 +25,7 @@ module.exports = {
       }
     },
     // Various Dev Server settings
-    host: 'localhost', // can be overwritten by process.env.HOST
+    host: '127.0.0.1', // can be overwritten by process.env.HOST
     port: 9528, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     autoOpenBrowser: false,
     errorOverlay: true,
