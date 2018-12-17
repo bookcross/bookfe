@@ -96,9 +96,19 @@
   }
   export default {
     name: "BookEdit",
-
+    props:{
+      isEdit:{
+        type:Boolean,
+        default:false
+      },
+      showMsg:{
+        type:String,
+        default:"123"
+      }
+    },
     mounted() {
       this.map()
+
     },
     components: {
       Tinymce
@@ -138,7 +148,10 @@
         saveBook(this.bookForm).then(response => {
           console.log(response)
           if(response.restCode=='0000'){
-
+            let data={
+              isEdit:false
+            }
+            this.$emit('ee',data);
           }
         }).catch((err) => {
           console.log(err)

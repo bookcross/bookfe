@@ -64,10 +64,8 @@
       </div>
 
       <div v-if="isEdit">
-        <BookEdit></BookEdit>
+        <BookEdit :isEdit="isEdit" :showMsg="showMsg" v-on:ee="isEditChange"></BookEdit>
       </div>
-
-
     </el-card>
 
 
@@ -79,6 +77,15 @@
 
 <script>
   import BookEdit from './BookEdit'
+  export function findAll(queryCondition) {
+    return request({
+      url: '/zuul/bookInfo/searchBook?field=' +queryCondition.field+'&keyword='+queryCondition.keyword+'&pageNum='+queryCondition.pageNum,
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post'
+    })
+  }
   export default {
     name: "UserBook",
     methods: {
@@ -91,19 +98,41 @@
       handleClick(tab, event) {
         console.log(tab, event);
       },
+      isEditChange(data){
+        if (data.isEdit==false){
+          this.isEdit=false
+        }
+      },
       jumpTo: function (s) {
         this.$router.push(s);
+      },
+      findByCondition(){
+        findAll(this.queryCondition).then(response => {
+          this.linkList = response.list;
+          this.totalEnum=response.endRow
+        }).catch((err) => {
+          console.log(err)
+        });
       }
     },
     data() {
       return {
+        totalEnum:0,
         isEdit:false,
-        tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }]
+        showMsg:"abbc",
+        linkList: [],
+        queryCondition:{
+          field:'',
+          keyword:'',
+          pageNum:0
+        }
       }
+    },
+    mounted(){
+      this.queryCondition.field='userId';
+      this.queryCondition.keyword='12345';
+      this.queryCondition.pageNum=1;
+      this.findByCondition()
     }
   }
 </script>

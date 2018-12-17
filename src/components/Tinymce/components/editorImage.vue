@@ -72,7 +72,7 @@
         }
       },
       getUploadUrl() {
-        return process.env.BASE_API + "/api/udfs/uploadFile.do_"
+        return process.env.BASE_API + "/zuul/file/upload"
       },
       checkAllSuccess() {
         return Object.keys(this.listObj).every(item => this.listObj[item].hasSuccess)

@@ -5,7 +5,7 @@
         <span>最新公告</span>
         <el-button style="float: right; padding: 3px 0" type="text">查看所有</el-button>
       </div>
-      <div v-for="o in this.tableData" :key="o" class="text item" style="font-size: small;color: #666">
+      <div v-for="o in this.tableData" :key="o.id" class="text item" style="font-size: small;color: #666">
         <span>{{o.date}} &nbsp;<b>{{o.address}}</b></span>
       </div>
     </el-card>
@@ -15,7 +15,7 @@
         <span>漂流动态</span>
         <el-button style="float: right; padding: 3px 0" type="text">查看所有</el-button>
       </div>
-      <div v-for="o in this.tableData" :key="o" class="text item" style="font-size: small;font-size: small;color: #666">
+      <div v-for="o in this.tableData" :key="o.id" class="text item" style="font-size: small;font-size: small;color: #666">
         <span>{{o.date}} &nbsp;<b>{{o.address}}</b></span>
       </div>
     </el-card>
