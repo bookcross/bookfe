@@ -10,23 +10,30 @@
       <el-form-item label="用户名：" prop="username">
         <el-input v-model="ruleForm.username" style='width:200px'></el-input>
       </el-form-item>
-      <el-form-item label="移动电话：" prop="phoneNum">
-        <el-input v-model="ruleForm.phoneNum" style='width:200px'></el-input>
+      <el-form-item label="移动电话：" prop="phone">
+        <el-input v-model="ruleForm.phone" style='width:200px'></el-input>
       </el-form-item>
       <el-form-item label="微信：">
-        <el-input v-model="ruleForm.phoneNum" style='width:200px'></el-input>
+        <el-input v-model="ruleForm.wxnumber" style='width:200px'></el-input>
       </el-form-item>
-      <el-form-item label="头像：" prop="userImg">
+      <el-form-item label="头像：">
         <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          list-type="picture-card"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove">
-          <i class="el-icon-plus"></i>
+          style="width: 150px"
+          v-loading="loading2"
+          class="avatar-uploader"
+          :action=getUploadUrl()
+          method:="post"
+          :show-file-list="false"
+          :on-error="handleAvatarerror"
+          :on-success="handleAvatarSuccess"
+          :before-upload="beforeAvatarUpload">
+          <img v-if="ruleForm.userlogo" :src="ruleForm.userlogo" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"
+             style="border: 1px solid"></i>
         </el-upload>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">修改资料</el-button>
+        <el-button type="primary" @click="changeUserInfo">修改资料</el-button>
         <el-button type="warning" @click="dialogFormVisible = true">修改密码</el-button>
       </el-form-item>
     </el-form>
@@ -49,30 +56,114 @@
 </template>
 
 <script>
+  import request from '@/utils/request'
+  export function getUserInfo(){
+    return request({
+      url: '/auth/user/getUser',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post'
+    })
+  }
+
+  export function updateUserInfo(form){
+    return request({
+      url: '/auth/user/updateUser',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post',
+      data:form
+    })
+  }
   export default {
     name: "UserSetting",
+    mounted(){
+      getUserInfo().then(response=>{
+        this.ruleForm.userlogo=response.data.userlogo
+        this.ruleForm.username=response.data.username
+        this.ruleForm.wxnumber=response.data.wxnumber
+        this.ruleForm.phone=response.data.phone
+      }).catch(err=>{console.log(err)})
+    },
     methods: {
+      changeUserInfo(){
+        updateUserInfo(this.ruleForm)
+      },
+      getIcon(fileName){
+        var fileExtend='';
+        if(fileName!=null){
+          fileExtend=fileName.substring(fileName.lastIndexOf('.')).toLowerCase();
+        }
+        console.log(fileExtend)
+        if(fileExtend=='.jpg'||fileExtend=='.png'||fileExtend=='.jpeg'||fileExtend=='.bmp'||fileExtend=='.gif'){
+          return "success"
+        }
+        else {
+          return "error"
+        }
+      },
       handleClick(tab, event) {
         console.log(tab, event);
+      },
+      getUploadUrl: function () {
+        return process.env.BASE_API + "/zuul/file/upload"
+      },
+      handleAvatarSuccess(res, file) {
+        if(res.restCode=="0000"){
+          this.ruleForm.userlogo = res.data
+          this.loading2=false
+        }else{
+          this.$message({
+            message: res.code,
+            type: 'error'
+          })
+          this.loading2=false
+        }
+      },
+      handleAvatarerror(res){
+        this.$message({
+          message: '网络错误',
+          type: 'error'
+        })
+        this.loading2=false
+      },
+      beforeAvatarUpload(file) {
+        console.log(file.type)
+        var isJPG =true
+        this.loading2=true
+        const isLt2M = file.size / 1024 / 1024 < 1;
+        if( this.getIcon(file.name)=='error'){
+          isJPG = false
+          this.$message.error('格式必须为.gif .png .jpg .jpeg .bmp');
+          this.loading2=false
+        }
+        if (!isLt2M) {
+          this.$message.error('上传头像图片大小不能超过 1MB!');
+          this.loading2=false
+        }
+        return isJPG && isLt2M;
       }
     },
     data() {
       return {
+        loading2:false,
         dialogFormVisible: false,
         ruleForm: {
           username: '',
-          userImg: '',
-          phoneNum: '',
-          weiNum: '',
+          userlogo: '',
+          phone: '',
+          wxnumber: '',
         },
         rules: {
           username: [
             {required: true, message: '输入用户名', trigger: 'blur'},
             {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
           ],
-          phoneNum: [
+          phone: [
             {required: true, message: '输入电话号码', trigger: 'blur'},
-            {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
+            {min: 11, max: 11, message: '电话长度不对', trigger: 'blur'}
           ],
         }
       }
@@ -82,4 +173,30 @@
 
 <style scoped>
 
+  .avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+  }
+
+  .avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 148px;
+    height: 148px;
+    line-height: 148px;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 148px;
+    height: 148px;
+    display: block;
+  }
 </style>

@@ -6,8 +6,9 @@
           <div class="block">
             <!--<span class="demonstration">默认 Hover 指示器触发</span>-->
             <el-carousel height="300px" indicator-position="none">
-              <el-carousel-item v-for="item in 5" :key="item">
-                <h3>{{ item }}</h3>
+              <el-carousel-item v-for="(o, index) in this.bookData.picList" >
+                <div class="box">
+                  <img :src="o.url"/></div>
               </el-carousel-item>
             </el-carousel>
           </div>
@@ -15,24 +16,24 @@
       </el-col>
       <el-col :span="15">
         <div>
-          <h3>鲁宾逊漂流记
+          <h3>{{this.bookData.bookName}}
             <el-rate
-              v-model="value5"
+              v-model="this.bookData.star"
               disabled
               show-score
               text-color="#ff9900"
               score-template="{value}">
             </el-rate>
           </h3>
-          <b>作者：</b><span>笛福</span><br/>
-          <b>主人：</b><span>王小明</span><br/>
-          <b>类别：</b><span>励志</span><br/>
-          <b>适合年龄：</b><span>成人</span><br/>
-          <b>现在位置：</b><span>湖北省武汉市</span><br/>
-          <el-button type="text" size="big" icon="el-icon-star-off">收藏(41)</el-button>
-          <el-button type="text" icon="el-icon-edit" @click="dialogFormVisible = true">书评(22)</el-button>
+          <b>作者：</b><span>{{this.bookData.author}}</span><br/>
+          <b>主人：</b><span>{{this.bookData.bookOwner}}</span><br/>
+          <b>类别：</b><span>{{this.bookData.bookType}}</span><br/>
+          <b>适合年龄：</b><span>{{this.bookData.suitableAge}}</span><br/>
+          <b>现在位置：</b><span>{{this.bookData.address}}</span><br/>
+          <el-button type="text" size="big" icon="el-icon-star-off">收藏({{this.bookData.collectionNum}})</el-button>
+          <el-button type="text" icon="el-icon-edit" @click="dialogFormVisible2 = true">书评({{this.bookData.replayNum}})</el-button>
           <p>
-            <el-button type="primary" size="small">借阅</el-button>
+            <el-button type="primary" size="small" @click="showReply">借阅</el-button>
           </p>
           <br/>
         </div>
@@ -40,7 +41,7 @@
     </el-row>
     <div style="margin:2px 0px;">
       <h4>简介：</h4>
-      <show-more style="margin-top: 20px" :showHeight="showHeight" :content="contentTxt"></show-more>
+      <show-more style="margin-top: 10px" :showHeight="showHeight" :content="bookData.bookConent"></show-more>
     </div>
     <div style="margin:2px 0px;">
       <h4>漂流动态：</h4>
@@ -48,13 +49,20 @@
     </div>
     <div style="margin:2px 0px;">
       <h4>书评：</h4>
-      <comment :comments="commentData"></comment>
+      <comment :comments="replyData"></comment>
     </div>
-    <el-dialog title="评论" :visible.sync="dialogFormVisible">
-      <div><Tinymce ref="editor" :height="400"/></div>
+    <el-dialog title="评论" :visible.sync="dialogFormVisible2">
+
+      <el-rate
+        v-model="this.replyForm.star"
+        show-score
+        text-color="#ff9900"
+        score-template="{value}">
+      </el-rate><br/>
+      <div><Tinymce ref="editor" :height="400" v-model="replyForm.content"/></div>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button @click="dialogFormVisible2 = false" >取 消</el-button>
+        <el-button type="primary" @click="sendRootReply">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -67,12 +75,54 @@
   import Tinymce from '../components/Tinymce'
 
   import showMore from '../components/ShowMore'
+  import request from '@/utils/request'
+
+  export function getBookDetail(id) {
+    return request({
+      url: '/zuul/bookInfo/getBookDetail?id='+id,
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post'
+    })
+  }
+  export function getBookReply(queryCondition) {
+    return request({
+      url: '/zuul/bookReply/readAll?pageNum='+queryCondition.pageNum+'&bookId='+queryCondition.bookId,
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post'
+    })
+  }
+  export function addReplyRequest(form) {
+    return request({
+      url: '/zuul/bookReply/saveReply',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post',
+      data:form
+    })
+  }
   export default {
     created(){
       this.commentData = CommentData.comment.data;
+      this.bookId=this.$route.query.bookId;
     },
     mounted (){
       this.map()
+      this.bookId=this.$route.query.bookId;
+      getBookDetail(parseInt(this.bookId)).then(response=>{
+        this.bookData=response
+       }).catch(error=>{console.log(error)})
+      this.queryCondition.pageNum=1
+      this.queryCondition.bookId=this.bookId
+      getBookReply(this.queryCondition).then(res=>{
+        this.replyData=res.list
+        // this.replyData.push(this.reply)
+      }).catch(err=>{console.log(err)})
+
     },
     components: {
       showMore,
@@ -111,40 +161,41 @@
         map.addOverlay(marker2);
         map.addOverlay(marker3);
         map.addOverlay(polyline);
+      },
+      showReply(){
+        console.log(this.replyData)
+        console.log( CommentData.comment.data)
+
+      },
+      sendRootReply(){
+          this.replyForm.bookId=this.bookId
+          this.replyForm.parentId=0
+          addReplyRequest(this.replyForm).then(response=>{
+              this.replyData=response
+            console.log(this.replyData)
+          }).then(err=>{console.log(err)})
       }
     },
     name: "BookDetail",
     data() {
       return {
-        dialogFormVisible:false,
-        commentData: [],
+        queryCondition:{
+          pageNum:'',
+          bookId:''
+        },
+        bookId:'',
+        dialogFormVisible2:false,
+        replyData: [],
+        replyForm:{
+          parentId:'',
+          bookId:'',
+          acceptId:'',
+          acceptName:'',
+          content:'123',
+          star:4
+        },
+        bookData:{},
         value5: 4.5,
-        contentTxt: "注意：该项目目前使用element-ui@1.4.2版本，所以最低兼容 Vue 2.3.0\n" +
-          "\n" +
-          "楼主这里有一份调查问卷 有空请填写一下，以表对本项目的支持~ps:不是给这个调查问卷网站做广告，所以填完问卷不用点上面抽奖有的没的那些东西\n" +
-          "前言\n" +
-          "\n" +
-          "    这半年来一直在用vue写管理后台，目前后台已经有百来个页面，十几种权限，但维护成本依然很低，所以准备开源分享一下后台开发的经验和成果。目前的技术栈主要的采用vue+element+axios由webpack2打包。由于是个人项目，所以数据请求都是用了mockjs模拟。注意：在此项目基础上改造开发时请移除mock文件。\n" +
-          "\n" +
-          "写了一个系列的教程配套文章，如何从零构建后一个完整的后台项目:\n" +
-          "\n" +
-          "    wiki\n" +
-          "    手摸手，带你用 vue 撸后台 系列一(基础篇)\n" +
-          "    手摸手，带你用 vue 撸后台 系列二(登录权限篇)\n" +
-          "    手摸手，带你用 vue 撸后台 系列三 (实战篇)\n" +
-          "    手摸手，带你用vue撸后台 系列四(vueAdmin 一个极简的后台基础模板)\n" +
-          "\n" +
-          "    手摸手，带你封装一个vue component\n" +
-          "\n" +
-          "    相应需求，开了一个qq群 591724180 方便大家交流\n" +
-          "\n" +
-          "    或者可以加入该 圈子 讨论问题\n" +
-          "\n" +
-          "    如有问题请先看上述文章和Wiki，若不能满足，欢迎 issue 和 pr\n" +
-          "\n" +
-          "    该项目并不是一个脚手架，更倾向于是一个集成解决方案\n" +
-          "\n" +
-          "    该项目不支持低版本游览器(如ie)，有需求请自行添加polyfil",
         showHeight: 100
       }
     }
@@ -155,8 +206,23 @@
   .el-carousel__item:nth-child(2n) {
     background-color: #99a9bf;
   }
-
   .el-carousel__item:nth-child(2n+1) {
     background-color: #d3dce6;
+  }
+  .box {
+    width: 100%;
+    height: 290px;
+    overflow: hidden;
+    position: relative;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .box img {
+    height: 100%;
+    width: auto;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 </style>

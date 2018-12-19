@@ -21,7 +21,7 @@
                 <img :src="o.bookHeadImg" alt=""/>
               </div>
               <div style="padding: 14px;">
-                <span v-on:click="jumpToBookdetail()">{{o.bookName}}</span>
+                <span v-on:click="jumpToBookdetail(o.id)">{{o.bookName}}</span>
                 <div class="bottom clearfix">
                   <time class="time">{{o.author}} 著</time>
                 </div>
@@ -43,12 +43,13 @@
       <el-tab-pane label="可借列表" name="second">
         <el-row :gutter="20">
           <el-col v-for="(o, index) in this.linkList" :key="o.id" style="padding-top: 10px;width: 157px">
+
             <el-card :body-style="{ padding: '0px' }">
               <div class="box">
                 <img :src="o.bookHeadImg" alt=""/>
               </div>
               <div style="padding: 14px;">
-                <span v-on:click="jumpToBookdetail()">{{o.bookName}}</span>
+                <span v-on:click="jumpToBookdetail(o.id)" >{{o.bookName}}</span>
                 <div class="bottom clearfix">
                   <time class="time">{{o.author}} 著</time>
                 </div>
@@ -174,8 +175,9 @@
           this.findByCondition(this.queryCondition)
         }
       },
-      jumpToBookdetail: function () {
-        this.$router.push('/bookdetail');
+      jumpToBookdetail: function (id) {
+        console.log(id)
+        this.$router.push({path:'/bookdetail',query:{bookId:id}});
       },
       findByCondition(queryCondition){
         findAll(this.queryCondition).then(response => {

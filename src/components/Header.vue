@@ -58,6 +58,18 @@
 <script>
   import LangStorage from '../utils/lang'
   import auth from '../utils/auth'
+  import {getToken,removeToken} from "../utils/auth";
+  import request from '@/utils/request'
+  export function logout2()  {
+    return request({
+      url: '/auth/logout',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'get'
+    })
+  }
+
   export default {
     data() {
       return {
@@ -72,7 +84,7 @@
         return this.$store.state.username
       },
       isLogin(){
-        return this.$store.state.isLogin
+          return this.$store.state.isLogin
       }
     },
     methods: {
@@ -83,12 +95,16 @@
         this.$router.push(s);
       },
       logout:function(){
-        this.isLogin=false
-        LangStorage.removeItem('isLogin')
-        LangStorage.removeItem('username')
-        this.$store.commit('changeLogin', false)
-        this.$store.commit('changeUser', undefined)
-        this.$router.push('/login');
+        logout2().then(response =>{
+          this.isLogin=false
+          LangStorage.removeItem('isLogin')
+          LangStorage.removeItem('username')
+          removeToken()
+          this.$store.commit('changeLogin', false)
+          this.$store.commit('changeUser', undefined)
+          this.$router.push('/login');
+        }).catch(err => {})
+
       }
     }
   }

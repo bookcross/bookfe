@@ -49,9 +49,8 @@
         // $nextTick()，等待内容获取完毕再计算高度，异步处理
         this.$nextTick().then(() => {
           let contentHeight = this.$refs.content.clientHeight
-
-          alert("contentHeight"+contentHeight)
-          alert("showHeight"+this.showHeight)
+          // alert("contentHeight"+contentHeight)
+          // alert("showHeight"+this.showHeight)
           if (contentHeight > this.showHeight) {
             this.isLongContent = true
           } else {

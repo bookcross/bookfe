@@ -11,7 +11,6 @@
       <div v-if="!isEdit">
         <el-row :gutter="20">
           <el-table
-            :data="tableData"
             style="width: 100%">
             <el-table-column
               label="书名"
@@ -77,6 +76,7 @@
 
 <script>
   import BookEdit from './BookEdit'
+  import request from '@/utils/request'
   export function findAll(queryCondition) {
     return request({
       url: '/zuul/bookInfo/searchBook?field=' +queryCondition.field+'&keyword='+queryCondition.keyword+'&pageNum='+queryCondition.pageNum,
