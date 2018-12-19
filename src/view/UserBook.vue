@@ -11,12 +11,13 @@
       <div v-if="!isEdit">
         <el-row :gutter="20">
           <el-table
+            :data="linkList"
             style="width: 100%">
             <el-table-column
               label="书名"
               width="180">
               <template slot-scope="scope">
-                <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                <span style="margin-left: 10px">{{ scope.row.bookName }}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -24,21 +25,26 @@
               width="180">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
-                <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                <span style="margin-left: 10px">{{ scope.row.createDate }}</span>
               </template>
             </el-table-column>
             <el-table-column
               label="姓名"
               width="180">
               <template slot-scope="scope">
-                <el-popover trigger="hover" placement="top">
-                  <p>姓名: {{ scope.row.name }}</p>
-                  <p>住址: {{ scope.row.address }}</p>
-                  <div slot="reference" class="name-wrapper">
-                    <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                  </div>
-                </el-popover>
+                <div slot="reference" class="name-wrapper">
+                <el-tag size="medium">{{ scope.row.address }}</el-tag>
+                </div>
               </template>
+              <!--<template slot-scope="scope">-->
+                <!--<el-popover trigger="hover" placement="top">-->
+                  <!--<p>姓名: {{ scope.row.name }}</p>-->
+                  <!--<p>住址: {{ scope.row.address }}</p>-->
+                  <!--<div slot="reference" class="name-wrapper">-->
+                    <!--<el-tag size="medium">{{ scope.row.address }}</el-tag>-->
+                  <!--</div>-->
+                <!--</el-popover>-->
+              <!--</template>-->
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
@@ -58,7 +64,7 @@
           style="margin-top: 12px;"
           background
           layout="prev, pager, next"
-          :total="110">
+          :total="totalEnum">
         </el-pagination>
       </div>
 
@@ -79,7 +85,7 @@
   import request from '@/utils/request'
   export function findAll(queryCondition) {
     return request({
-      url: '/zuul/bookInfo/searchBook?field=' +queryCondition.field+'&keyword='+queryCondition.keyword+'&pageNum='+queryCondition.pageNum,
+      url: '/zuul/bookInfo/searchBook?type=' +0+'&keyword='+queryCondition.keyword+'&pageNum='+queryCondition.pageNum,
       headers: {
         'content-type': 'application/json'
       },
@@ -109,6 +115,7 @@
       findByCondition(){
         findAll(this.queryCondition).then(response => {
           this.linkList = response.list;
+          console.log(this.linkList)
           this.totalEnum=response.endRow
         }).catch((err) => {
           console.log(err)

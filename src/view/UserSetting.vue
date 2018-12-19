@@ -85,6 +85,7 @@
         this.ruleForm.username=response.data.username
         this.ruleForm.wxnumber=response.data.wxnumber
         this.ruleForm.phone=response.data.phone
+        this.ruleForm.userid=response.data.userid
       }).catch(err=>{console.log(err)})
     },
     methods: {
@@ -155,6 +156,7 @@
           userlogo: '',
           phone: '',
           wxnumber: '',
+          userid:''
         },
         rules: {
           username: [
