@@ -25,7 +25,7 @@
               width="180">
               <template slot-scope="scope">
                 <i class="el-icon-time"></i>
-                <span style="margin-left: 10px">{{ scope.row.createDate }}</span>
+                <span style="margin-left: 10px">{{ transTime(scope.row.createdDate )}}</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -81,6 +81,7 @@
 </template>
 
 <script>
+  import { formatDate } from 'element-ui/packages/date-picker/src/util';
   import BookEdit from './BookEdit'
   import request from '@/utils/request'
   export function findAll(queryCondition) {
@@ -101,6 +102,9 @@
       BookEdit
     },
     methods:{
+      transTime(a){
+        return  formatDate(a, 'yyyy-MM-dd')
+      },
       handleClick(tab, event) {
         console.log(tab, event);
       },
@@ -108,6 +112,7 @@
         if (data.isEdit==false){
           this.isEdit=false
         }
+        this.findByCondition()
       },
       jumpTo: function (s) {
         this.$router.push(s);

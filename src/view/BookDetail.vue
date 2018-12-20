@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-loading="loading">
     <el-row :gutter="20">
       <el-col :span="9">
         <div>
           <div class="block">
             <!--<span class="demonstration">默认 Hover 指示器触发</span>-->
             <el-carousel height="300px" indicator-position="none">
-              <el-carousel-item v-for="(o, index) in this.bookData.picList" >
+              <el-carousel-item v-for="(o, index) in bookData.picList" :key="o.url">
                 <div class="box">
                   <img :src="o.url"/></div>
               </el-carousel-item>
@@ -16,22 +16,22 @@
       </el-col>
       <el-col :span="15">
         <div>
-          <h3>{{this.bookData.bookName}}
+          <h3>{{bookData.bookName}}
             <el-rate
-              v-model="this.bookData.star"
+              v-model="(this.bookData.starNum==0||this.bookData.starNum==null)?0:(this.bookData.star/this.bookData.starNum).toFixed(1)"
               disabled
               show-score
               text-color="#ff9900"
-              score-template="{value}">
+              score-template="{value}星">
             </el-rate>
           </h3>
-          <b>作者：</b><span>{{this.bookData.author}}</span><br/>
-          <b>主人：</b><span>{{this.bookData.bookOwner}}</span><br/>
-          <b>类别：</b><span>{{this.bookData.bookType}}</span><br/>
-          <b>适合年龄：</b><span>{{this.bookData.suitableAge}}</span><br/>
-          <b>现在位置：</b><span>{{this.bookData.address}}</span><br/>
-          <el-button type="text" size="big" icon="el-icon-star-off">收藏({{this.bookData.collectionNum}})</el-button>
-          <el-button type="text" icon="el-icon-edit" @click="dialogFormVisible2 = true">书评({{this.bookData.replayNum}})</el-button>
+          <b>作者：</b><span>{{bookData.author}}</span><br/>
+          <b>主人：</b><span>{{bookData.bookOwner}}</span><br/>
+          <b>类别：</b><span>{{bookData.bookType}}</span><br/>
+          <b>适合年龄：</b><span>{{bookData.suitableAge}}</span><br/>
+          <b>现在位置：</b><span>{{bookData.address}}</span><br/>
+          <el-button type="text" size="big" icon="el-icon-star-off">收藏({{bookData.collectionNum}})</el-button>
+          <el-button type="text" icon="el-icon-edit" @click="dialogFormVisible2 = true">书评({{bookData.starNum}})</el-button>
           <p>
             <el-button type="primary" size="small" @click="showReply">借阅</el-button>
           </p>
@@ -40,26 +40,37 @@
       </el-col>
     </el-row>
     <div style="margin:2px 0px;">
-      <h4>简介：</h4>
-      <show-more style="margin-top: 10px" :showHeight="showHeight" :content="bookData.bookConent"></show-more>
+      <fieldset style="border-top: 1px dashed lightgray;border-bottom: none;border-left: none;border-right: none">
+        <legend><h5>【简介】</h5></legend><show-more style="margin-top: 10px" :showHeight="showHeight" :content="bookData.bookConent"></show-more>
+      </fieldset>
+
+
     </div>
     <div style="margin:2px 0px;">
-      <h4>漂流动态：</h4>
-      <div id="allmap" ref="allmap" style="height: 300px"></div>
+      <fieldset style="border-top: 1px dashed lightgray;border-bottom: none;border-left: none;border-right: none">
+        <legend>  <h5>【轨迹】</h5></legend>
+        <div id="allmap" ref="allmap" style="height: 300px"></div>
+      </fieldset>
+
+
     </div>
     <div style="margin:2px 0px;">
-      <h4>书评：</h4>
-      <comment :comments="replyData"></comment>
+      <fieldset style="border-top: 1px dashed lightgray;border-bottom: none;border-left: none;border-right: none">
+        <legend>   <h5>【书评】</h5></legend>
+
+        <comment :comments="replyData"></comment>
+      </fieldset>
+
     </div>
     <el-dialog title="评论" :visible.sync="dialogFormVisible2">
 
       <el-rate
-        v-model="this.replyForm.star"
+        v-model="replyForm.star"
         show-score
         text-color="#ff9900"
         score-template="{value}">
       </el-rate><br/>
-      <div><Tinymce ref="editor" :height="400" v-model="replyForm.content"/></div>
+      <div><Tinymce ref="editor" :height="400" v-model="replyForm.content" v-if="dialogFormVisible2"/></div>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible2 = false" >取 消</el-button>
         <el-button type="primary" @click="sendRootReply">确 定</el-button>
@@ -118,11 +129,7 @@
        }).catch(error=>{console.log(error)})
       this.queryCondition.pageNum=1
       this.queryCondition.bookId=this.bookId
-      getBookReply(this.queryCondition).then(res=>{
-        this.replyData=res.list
-        // this.replyData.push(this.reply)
-      }).catch(err=>{console.log(err)})
-
+      this.shuaxinReply()
     },
     components: {
       showMore,
@@ -168,12 +175,24 @@
 
       },
       sendRootReply(){
+        var aaa=this
           this.replyForm.bookId=this.bookId
           this.replyForm.parentId=0
           addReplyRequest(this.replyForm).then(response=>{
-              this.replyData=response
+            this.replyData=response
             console.log(this.replyData)
-          }).then(err=>{console.log(err)})
+            this.replyForm.star=4
+            this.replyForm.content=''
+            this.dialogFormVisible2=false
+            this.shuaxinReply()
+          }).catch(err=>{console.log(err)})
+      },
+      shuaxinReply(){
+        getBookReply(this.queryCondition).then(res=>{
+          this.replyData=res.list
+          // this.replyData.push(this.reply)
+          this.loading=false
+        }).catch(err=>{console.log(err)})
       }
     },
     name: "BookDetail",
@@ -186,16 +205,29 @@
         bookId:'',
         dialogFormVisible2:false,
         replyData: [],
+        loading: true,
         replyForm:{
           parentId:'',
           bookId:'',
           acceptId:'',
           acceptName:'',
-          content:'123',
+          content:'',
           star:4
         },
-        bookData:{},
-        value5: 4.5,
+        starNum:null,
+        bookData:{
+          picList:null,
+          bookConent:null,
+          author:null,
+          bookOwner:null,
+          star:null,
+          starNum:null,
+          bookType:null,
+          suitableAge:null,
+          address:null,
+          bookConent:null,
+          collectionNum:null
+        },
         showHeight: 100
       }
     }

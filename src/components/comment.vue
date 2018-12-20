@@ -34,7 +34,7 @@
                 <el-input class="gray-bg-input" v-model="inputComment" type="textarea" :rows="3" autofocus
                           placeholder="写下你的评论"></el-input>
                 <div class="btn-control"><span class="cancel" @click="cancel">取消</span>
-                  <el-button class="btn" type="success" round @click="commitComment">确定</el-button>
+                  <el-button class="btn" type="success" round @click="commitComment(item)">确定</el-button>
                 </div>
               </div>
             </transition>
@@ -74,8 +74,7 @@ export default {
         bookId: '',
         acceptId: '',
         acceptName: '',
-        content: '123',
-        star: 4
+        content: '123'
       },
     }
   }, computed: {},
@@ -99,14 +98,18 @@ export default {
     }, /** * 点击取消按钮 */ cancel() {
       this.showItemId = ''
     }, /** * 提交评论 */
-    commitComment() {
+    commitComment(item) {
       var arr = this.inputComment.split(this.userColorName);
-      arr.shift();
+      if(arr.length>1){
+        debugger
+        arr.shift();
+      }
       this.replyForm.content = arr.toString();
       this.replyForm.contentx = 'sdf'
       addReplyRequest(this.replyForm).then(response => {
         // this.replyData=response
-        console.log(this.response)
+        this.showItemId = ''
+        item.bookReplyDtos.push(response.data)
       }).then(err => {
         console.log(err)
       })
@@ -114,7 +117,7 @@ export default {
     }, /** * 点击评论按钮显示输入框 * item: 当前大评论 * reply: 当前回复的评论 */
     showCommentInput(item, reply) {
       if (reply) {
-        this.userColorName = "@" + reply.senderName + " "
+        this.userColorName = "@" + reply.senderName + ""
         this.inputComment = "@" + reply.senderName + " "
         this.replyForm.parentId = (reply.parentId == 0) ? reply.id : reply.parentId
         this.replyForm.bookId = reply.bookId
