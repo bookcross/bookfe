@@ -107,7 +107,6 @@
       }
     },
     mounted() {
-      this.map()
 
     },
     components: {

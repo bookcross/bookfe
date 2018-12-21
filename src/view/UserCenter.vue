@@ -27,14 +27,14 @@
     },
     methods:{
       handleClick(tab, event) {
-        console.log(tab, event);
+        // console.log(tab, event);
       },
       jumpTo: function (s) {
         this.$router.push(s);
       }
     },
     mounted(){
-      console.log(this.$route.params.activeLabel)
+      // console.log(this.$route.params.activeLabel)
     },
     data() {
       return {
