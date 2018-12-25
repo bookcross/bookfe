@@ -7,6 +7,7 @@ import UserCenter from '@/view/UserCenter'
 import BookEdit from '@/view/BookEdit'
 import Login from '@/view/Login'
 import Register from '@/view/Register'
+import NewsCenter from '@/view/NewsCenter'
 
 Vue.use(Router)
 
@@ -79,6 +80,16 @@ export default new Router({
         leftAlive:false,//是否拥有左边菜单栏目
         rightAlive:false//是否拥有右边栏目
       }
-    }
+    },
+    {
+      path: '/NewsCenter',
+      name: 'NewsCenter',
+      component: NewsCenter,
+      meta:{
+        keepAlive:true,//是否属于正常页面
+        leftAlive:true,//是否拥有左边菜单栏目
+        rightAlive:false//是否拥有右边栏目
+      }
+    },
   ]
 })

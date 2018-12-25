@@ -15,7 +15,7 @@
       <i class="el-icon-menu"></i>
       <span slot="title">个人中心</span>
     </el-menu-item>
-    <el-menu-item index="2" v-on:click="jumpTo('/')">
+    <el-menu-item index="2" v-on:click="jumpTo('/NewsCenter')">
       <i class="el-icon-menu"></i>
       <span slot="title">消息通知</span>
     </el-menu-item>

@@ -1,7 +1,6 @@
 <template>
   <div v-loading="loading">
 
-    <div id="allmap2" ref="allmap2" style="height: 200px;"></div>
     <el-row :gutter="20">
       <el-col :span="9">
         <div>
@@ -95,19 +94,18 @@
         <el-col :span="8">
           <el-form label-width="80px">
             <el-form-item label="电话">
-              <el-input placeholder="电话"></el-input>
+              <el-input placeholder="电话" v-model="booCrossForm.phone"></el-input>
             </el-form-item>
             <el-form-item label="微信">
-              <el-input placeholder="微信选填"></el-input>
+              <el-input placeholder="微信选填"  v-model="booCrossForm.wechat"></el-input>
             </el-form-item>
             <el-form-item label="地图取点">
-              <el-input :readonly="true" placeholder="地图选点"></el-input>
-              <el-input style='width:200px' v-if="false"></el-input>
-              <el-input style='width:200px' v-if="false"></el-input>
+              <el-input :readonly="true" placeholder="地图选点" v-model="booCrossForm.accepterAddress"></el-input>
             </el-form-item>
           </el-form>
         </el-col>
         <el-col :span="16">
+          <div id="allmap2" ref="allmap2" style="height: 200px;"></div>
         </el-col>
         <div style="clear: both"></div>
         <el-form label-width="80px">
@@ -115,7 +113,7 @@
             <el-input placeholder="详细地址"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary">确认</el-button>
+            <el-button type="primary" @click="saveBookCross" v-model="booCrossForm.detailAddress">确认</el-button>
             <el-button>取消</el-button>
           </el-form-item>
         </el-form>
@@ -158,6 +156,16 @@
   export function addReplyRequest(form) {
     return request({
       url: '/zuul/bookReply/saveReply',
+      headers: {
+        'content-type': 'application/json'
+      },
+      method: 'post',
+      data: form
+    })
+  }
+  export  function addBookCross(form){
+    return request({
+      url: '/zuul/bookCross/borrowBook',
       headers: {
         'content-type': 'application/json'
       },
@@ -224,13 +232,24 @@
         map.addOverlay(polyline);
       },
       map2() {
+        var aaa=this;
         var map2 = new BMap.Map("allmap2");
+        var geoc = new BMap.Geocoder();
         map2.centerAndZoom(new BMap.Point(116.404, 39.915), 11);
         map2.enableScrollWheelZoom(true);
         function showInfo(e){
           var marker1 = new BMap.Marker(new BMap.Point(e.point.lng, e.point.lat));
           map2.clearOverlays();
           map2.addOverlay(marker1);
+          // this.booCrossForm.accepterJ=e.point.lng;
+          // this.booCrossForm.accepterW=e.point.lat;
+          geoc.getLocation(e.point, function (rs) {
+            var addComp = rs.addressComponents;
+            var address = (addComp.province + ", " + addComp.city + ", " + addComp.district);
+            aaa.booCrossForm.accepterJ=e.point.lng;
+            aaa.booCrossForm.accepterW=e.point.lat;
+            aaa.booCrossForm.accepterAddress=address
+          });
         }
         map2.addEventListener("click", showInfo);
       },
@@ -246,6 +265,16 @@
         setTimeout(() => {
           this.map2();
         },200)
+      },
+      saveBookCross(){
+        this.booCrossForm.message='phone:'+this.booCrossForm.phone+' wechat:'
+          +(this.booCrossForm.wechat==''?'null':this.booCrossForm.wechat)+' address:'
+          +this.booCrossForm.detailAddress
+        this.booCrossForm.bookId=this.bookId
+        this.booCrossForm.name=this.bookData.bookName
+        addBookCross(this.booCrossForm).then(response=>{
+
+        }).catch(err=>{console.log(err)})
       },
       sendRootReply() {
         var aaa = this
@@ -276,9 +305,15 @@
     data() {
       return {
         booCrossForm: {
-          address: '',
-          addressJ: '',
-          addressW: ''
+          phone:'',
+          wechat:'',
+          accepterJ:'',
+          accepterW:'',
+          accepterAddress:'',
+          message:'',
+          bookId:'',
+          name:'',
+          detailAddress:''
         },
         queryCondition: {
           pageNum: '',
@@ -299,8 +334,8 @@
           star: 4
         },
         bookData: {
+          bookName:null,
           picList: null,
-          bookConent: null,
           author: null,
           bookOwner: null,
           star: null,
